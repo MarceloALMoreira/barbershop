@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Card, CardContent } from "../ui/card";
 import logo from "../../../public/Logo.png";
