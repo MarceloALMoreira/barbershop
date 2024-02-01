@@ -51,7 +51,6 @@ model Booking {
   userId       String
   user         User       @relation(fields: [userId], references: [id])
   date         DateTime   @db.Timestamp
-  status String
 }
 
 model Account {
