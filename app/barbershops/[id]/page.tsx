@@ -1,22 +1,25 @@
 import { db } from "@/app/_lib/prisma";
-import BarbershopInfo from "../_components/barbershop-info";
-import ServiceItem from "../_components/service-item";
-import { Button } from "@/app/_components/ui/button";
+import BarbershopInfo from "./_components/barbershop-info";
+import ServiceItem from "./_components/service-item";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-interface BarbaershopDetailsPageProps {
-  params: any;
+interface BarbershopDetailsPageProps {
+  params: {
+    id?: string;
+  };
 }
-const BarberShopDetailsPage = async ({
+
+const BarbershopDetailsPage = async ({
   params,
-}: BarbaershopDetailsPageProps) => {
+}: BarbershopDetailsPageProps) => {
   const session = await getServerSession(authOptions);
 
   if (!params.id) {
-    // TODO, redirecionar para home page
+    // TODO: redirecionar para home page
     return null;
   }
+
   const barbershop = await db.barbershop.findUnique({
     where: {
       id: params.id,
@@ -27,7 +30,7 @@ const BarberShopDetailsPage = async ({
   });
 
   if (!barbershop) {
-    // TODO, redirecionar para home page
+    // TODO: redirecionar para home page
     return null;
   }
 
@@ -35,16 +38,11 @@ const BarberShopDetailsPage = async ({
     <div>
       <BarbershopInfo barbershop={barbershop} />
 
-      <div className="flex gap-4 px-5 py-6">
-        <Button>Serviços</Button>
-        <Button variant="outline">Informações</Button>
-      </div>
-
-      <div className="flex flex-col gap-3 px-5 pb-6">
+      <div className="flex flex-col gap-4 px-5 py-6">
         {barbershop.services.map((service) => (
           <ServiceItem
-            barbershop={barbershop}
             key={service.id}
+            barbershop={barbershop}
             service={service}
             isAuthenticated={!!session?.user}
           />
@@ -54,4 +52,4 @@ const BarberShopDetailsPage = async ({
   );
 };
 
-export default BarberShopDetailsPage;
+export default BarbershopDetailsPage;
