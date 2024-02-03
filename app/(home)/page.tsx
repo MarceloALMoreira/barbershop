@@ -5,7 +5,6 @@ import Search from "./_components/search";
 import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
 import BarberShopItem from "./_components/barbershop-item";
-import Footer from "../_components/footer";
 
 export default async function Home() {
   // chamar prisma e pegar barbearias
@@ -31,7 +30,7 @@ export default async function Home() {
         <h2 className="mb-3 text-xs font-bold uppercase text-gray-400">
           Agendamentos
         </h2>
-        <BookingItem />
+        {/* <BookingItem booking={} /> */}
       </div>
 
       <div className="mt-6 px-5">
