@@ -12,39 +12,47 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
 
   // chamar prisma e pegar barbearias
-  const barbarshops = await db.barbershop.findMany({});
+
+  // const barbarshops = await db.barbershop.findMany({});
 
   //Logica se temos usuer na session ele busca, se nao temos uma lista vazia
-  const bookings = session?.user
-    ? await db.booking.findMany({
-        where: {
-          userId: (session?.user as any).id,
-        },
-        include: {
-          service: true,
-          barbershop: true,
-        },
-      })
-    : [];
 
-  // Promisse All
-  // const [barbarshops, confirmedbookings] = await Promise.all([
-  //   db.booking.findMany({}),
-  //   session?.user
-  //     ? db.booking.findMany({
-  //         where: {
-  //           userId: (session.user as any).id,
-  //           date: {
-  //             gte: new Date(),
-  //           },
-  //         },
-  //         include: {
-  //           service: true,
-  //           barbershop: true,
-  //         },
-  //       })
-  //     : Promise.resolve([]),
-  // ]);
+  // const bookings = session?.user
+  //   ? await db.booking.findMany({
+  //       where: {
+  //         userId: (session?.user as any).id,
+  //       },
+  //       include: {
+  //         service: true,
+  //         barbershop: true,
+  //       },
+  //     })
+  //   : [];
+
+  // Usando o Promise All, melhorar perfomace
+  const [barbershops, recommendedBarbershops, confirmedBookings] =
+    await Promise.all([
+      db.barbershop.findMany({}),
+      db.barbershop.findMany({
+        orderBy: {
+          id: "asc",
+        },
+      }),
+      session?.user
+        ? db.booking.findMany({
+            where: {
+              userId: (session.user as any).id,
+              date: {
+                gte: new Date(),
+              },
+            },
+            include: {
+              service: true,
+              barbershop: true,
+            },
+          })
+        : Promise.resolve([]),
+    ]);
   return (
     <div>
       <Header />
@@ -63,35 +71,43 @@ export default async function Home() {
       </div>
 
       <div className="mt-6">
-        <h2 className="mb-3 pl-5 text-xs font-bold uppercase text-gray-400">
-          Agendamentos
-        </h2>
-
-        <div className=" mt-6 flex gap-3 overflow-x-auto px-5 [&::-webkit-scrollbar]:hidden">
-          {bookings.map((booking) => (
-            <BookingItem key={booking.id} booking={booking} />
-          ))}
-        </div>
+        {confirmedBookings.length > 0 && (
+          <>
+            <h2 className="mb-3 pl-5 text-xs font-bold uppercase text-gray-400">
+              Agendamentos
+            </h2>
+            <div className="flex gap-3 overflow-x-auto px-5 [&::-webkit-scrollbar]:hidden">
+              {confirmedBookings.map((booking) => (
+                <BookingItem key={booking.id} booking={booking} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="mt-6 px-5">
-        <h2 className="mb-3 text-xs font-bold uppercase text-gray-400">
+      <div className="mt-6">
+        <h2 className="mb-3 px-5 text-xs font-bold uppercase text-gray-400">
           Recomendados
         </h2>
-        <div className="flex gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {barbarshops.map((barbershop) => (
-            <BarberShopItem key={barbershop.id} barbershop={barbershop} />
+
+        <div className="flex gap-4 overflow-x-auto px-5 [&::-webkit-scrollbar]:hidden">
+          {barbershops.map((barbershop) => (
+            <div key={barbershop.id} className="min-w-[167px] max-w-[167px]">
+              <BarberShopItem key={barbershop.id} barbershop={barbershop} />
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="mb-[4.5rem] mt-6 px-5">
-        <h2 className="mb-3 text-xs font-bold uppercase text-gray-400">
+      <div className="mb-[4.5rem] mt-6">
+        <h2 className="mb-3 px-5 text-xs font-bold uppercase text-gray-400">
           Populares
         </h2>
-        <div className="flex gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden">
-          {barbarshops.map((barbershop) => (
-            <BarberShopItem key={barbershop.id} barbershop={barbershop} />
+        <div className="flex gap-4 overflow-x-auto px-5 [&::-webkit-scrollbar]:hidden">
+          {recommendedBarbershops.map((barbershop) => (
+            <div key={barbershop.id} className="min-w-[167px] max-w-[167px]">
+              <BarberShopItem key={barbershop.id} barbershop={barbershop} />
+            </div>
           ))}
         </div>
       </div>

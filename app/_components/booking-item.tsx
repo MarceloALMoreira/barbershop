@@ -21,6 +21,17 @@ import { Button } from "./ui/button";
 import { cancelBooking } from "../_actions/cancel-booking";
 import { toast } from "sonner";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
 
 interface BookingItemProps {
   booking: Prisma.BookingGetPayload<{
@@ -180,6 +191,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
               </CardContent>
             </Card>
 
+            {/* Logica cancelar reserva, antes estava no button, agora está dentro de um Alerte Dialog */}
             <SheetFooter className="mt-6 flex-row gap-3">
               <SheetClose asChild>
                 <Button variant="secondary" className="w-full">
@@ -187,17 +199,42 @@ const BookingItem = ({ booking }: BookingItemProps) => {
                 </Button>
               </SheetClose>
 
-              <Button
-                onClick={handleCancelClick}
-                disabled={!isBookingConfirmed || isDeleteLoading}
-                variant="destructive"
-                className="w-full"
-              >
-                {isDeleteLoading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Cencelar Reserva
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    disabled={!isBookingConfirmed || isDeleteLoading}
+                    variant="destructive"
+                    className="w-full"
+                  >
+                    Cencelar Reserva
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Deseja mesmo cancelar essa reserva?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Uma vez cancelada, não possivel reverter essa ação.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className=" flex-row gap-3">
+                    <AlertDialogCancel className="mt-0 w-full">
+                      Voltar
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="mt-0 w-full"
+                      disabled={!isBookingConfirmed || isDeleteLoading}
+                      onClick={handleCancelClick}
+                    >
+                      {isDeleteLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      Confirmar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </SheetFooter>
           </div>
         </div>

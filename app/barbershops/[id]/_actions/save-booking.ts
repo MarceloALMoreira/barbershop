@@ -20,6 +20,7 @@ export const saveBooking = async (params: SaveBookingParams) => {
     },
   });
 
+  //faz o next recaregar a pagina e remover o cach
   revalidatePath("/");
   revalidatePath("/bookings");
 };

@@ -5,7 +5,6 @@ import { signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { db } from "../_lib/prisma";
 import BookingItem from "../_components/booking-item";
-import { isFuture, isPast } from "date-fns";
 
 const BookingsPage = async () => {
   // recuperar a session do usuario (ver se ele ta logado ou nao)
@@ -52,30 +51,33 @@ const BookingsPage = async () => {
     <>
       <Header />
       <div className="px-5 py-6">
-        <h1 className="text-xl font-bold">Agendamentos</h1>
-
         {/* Vamos exibir o confirmados se o length for > que 0 */}
-        {confirmedBookings.length === 0 && finishedBookings.length === 0 && (
-          <h2 className="mb-3 mt-6 text-sm font-bold uppercase text-gray-400">
-            Confirmado
-          </h2>
+        <h1 className="mt-6 text-xl font-bold">Agendamentos</h1>
+        {confirmedBookings.length > 0 && (
+          <>
+            <h2 className="mb-3 text-sm font-bold uppercase text-gray-400">
+              Confirmado
+            </h2>
+            <div className="flex flex-col gap-3">
+              {confirmedBookings.map((bookig) => (
+                <BookingItem key={bookig.id} booking={bookig} />
+              ))}
+            </div>
+          </>
         )}
+        {finishedBookings.length > 0 && (
+          <>
+            <h2 className="mb-3 mt-6 text-sm font-bold uppercase text-gray-400">
+              Finalizado
+            </h2>
 
-        <div className="flex flex-col gap-3">
-          {confirmedBookings.map((bookig) => (
-            <BookingItem key={bookig.id} booking={bookig} />
-          ))}
-        </div>
-
-        <h2 className="mb-3 mt-6 text-sm font-bold uppercase text-gray-400">
-          Finalizado
-        </h2>
-
-        <div className="flex flex-col gap-3">
-          {finishedBookings.map((bookig) => (
-            <BookingItem key={bookig.id} booking={bookig} />
-          ))}
-        </div>
+            <div className="flex flex-col gap-3">
+              {finishedBookings.map((bookig) => (
+                <BookingItem key={bookig.id} booking={bookig} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </>
   );
