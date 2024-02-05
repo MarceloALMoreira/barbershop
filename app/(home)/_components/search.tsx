@@ -25,6 +25,7 @@ const formSchema = z.object({
     .min(1, "Campo obrigatório."),
 });
 
+//Definindo um valor padrão no filtro de search
 interface SearchProps {
   defaultValues?: z.infer<typeof formSchema>;
 }
